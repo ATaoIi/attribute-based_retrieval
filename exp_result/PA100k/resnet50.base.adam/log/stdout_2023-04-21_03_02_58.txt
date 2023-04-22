@@ -1,0 +1,133 @@
+BACKBONE:
+  MULTISCALE: False
+  TYPE: resnet50
+CLASSIFIER:
+  BN: False
+  NAME: linear
+  POOLING: avg
+  SCALE: 1
+  TYPE: base
+DATASET:
+  HEIGHT: 256
+  LABEL: eval
+  NAME: PA100k
+  TARGETTRANSFORM: []
+  TEST_SPLIT: test
+  TRAIN_SPLIT: trainval
+  TYPE: pedes
+  VAL_SPLIT: test
+  WIDTH: 192
+  ZERO_SHOT: False
+DISTRIBUTTED: False
+INFER:
+  SAMPLING: False
+LOSS:
+  LOSS_WEIGHT: [1]
+  SAMPLE_WEIGHT: weight
+  SIZESUM: True
+  TYPE: bceloss
+METRIC:
+  TYPE: pedestrian
+NAME: resnet50.base.adam
+REDIRECTOR: True
+RELOAD:
+  NAME: backbone
+  PTH: 
+  TYPE: False
+TRAIN:
+  AUX_LOSS_START: -1
+  BATCH_SIZE: 64
+  BN_WD: True
+  CLIP_GRAD: True
+  DATAAUG:
+    AUTOAUG_PROB: 0.5
+    TYPE: base
+  EMA:
+    DECAY: 0.9998
+    ENABLE: True
+    FORCE_CPU: False
+  LR_SCHEDULER:
+    LR_FT: 0.0001
+    LR_NEW: 0.0001
+    LR_STEP: [0]
+    TYPE: plateau
+    WMUP_COEF: 0.1
+  MAX_EPOCH: 30
+  NUM_WORKERS: 4
+  OPTIMIZER:
+    MOMENTUM: 0.9
+    TYPE: adam
+    WEIGHT_DECAY: 0.0005
+  SHUFFLE: True
+TRANS:
+  DEC_LAYERS: 6
+  DIM_FFD: 2048
+  DIM_HIDDEN: 256
+  DROPOUT: 0.1
+  ENC_LAYERS: 6
+  EOS_COEF: 0.1
+  NHEADS: 8
+  NUM_QUERIES: 100
+  PRE_NORM: False
+VIS:
+  CAM: valid
+  TENSORBOARD:
+    ENABLE: True
+  VISDOM: False
+Compose(
+    Resize(size=(256, 192), interpolation=bilinear, max_size=None, antialias=None)
+    Pad(padding=10, fill=0, padding_mode=constant)
+    RandomCrop(size=(256, 192), padding=None)
+    RandomHorizontalFlip(p=0.5)
+    ToTensor()
+    Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+)
+which pickle ./data\PA100k\dataset_all.pkl
+trainval target_label: all
+which pickle ./data\PA100k\dataset_all.pkl
+test target_label: all
+------------------------------------------------------------
+PA100k attr_num : 26, eval_attr_num : 26 trainval set: 90000, test set: 10000, 
+backbone: resnet50, classifier: linear
+model_name: resnet50.base.adam
+2023-04-21_03:04:37, Step 99/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.46s , train_loss: 12.4522, 
+['0.0000']
+2023-04-21_03:05:23, Step 199/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.46s , train_loss: 10.6005, 
+['0.0000']
+2023-04-21_03:06:10, Step 299/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.46s , train_loss: 9.6312, 
+['0.0000']
+2023-04-21_03:07:00, Step 399/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.48s , train_loss: 9.0315, 
+['0.0000']
+2023-04-21_03:07:46, Step 499/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.46s , train_loss: 8.5682, 
+['0.0000']
+2023-04-21_03:08:33, Step 599/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.46s , train_loss: 8.2055, 
+['0.0000']
+2023-04-21_03:09:20, Step 699/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.46s , train_loss: 7.9197, 
+['0.0000']
+2023-04-21_03:10:06, Step 799/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.47s , train_loss: 7.6767, 
+['0.0000']
+2023-04-21_03:10:53, Step 899/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.47s , train_loss: 7.4775, 
+['0.0000']
+2023-04-21_03:11:40, Step 999/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.47s , train_loss: 7.2984, 
+['0.0000']
+2023-04-21_03:12:28, Step 1099/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.48s , train_loss: 7.1433, 
+['0.0000']
+2023-04-21_03:13:16, Step 1199/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.47s , train_loss: 7.0018, 
+['0.0000']
+2023-04-21_03:14:04, Step 1299/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.49s , train_loss: 6.8771, 
+['0.0000']
+2023-04-21_03:14:52, Step 1399/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.47s , train_loss: 6.7614, 
+['0.0000']
+2023-04-21_03:14:54, Step 1405/1406 in Ep 0, LR: [1.0e-04, 1.0e-04] Time: 0.46s , train_loss: 6.7540, 
+['0.0000']
+Epoch 0, LR 0.0001, Train_Time 713.88s, Loss: 6.7540
+using model_ema to validate
+['0.0000']
+Evaluation on train set, train losses 6.753985859252311
+ ma: 0.8042, label_f1: 0.6837, pos_recall: 0.6552 , neg_recall: 0.9532 
+ Acc: 0.7897, Prec: 0.8848, Rec: 0.8610, F1: 0.8727
+Evaluation on test set, valid losses 18.033078734282476
+ ma: 0.5993, label_f1: 0.3112, pos_recall: 0.3143 , neg_recall: 0.8843 
+ Acc: 0.4931, Prec: 0.7010, Rec: 0.6110, F1: 0.6529
+2023-04-21_03:15:26
+------------------------------------------------------------
