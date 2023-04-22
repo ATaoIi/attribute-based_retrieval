@@ -1,2 +1,4 @@
 *.pkl filter=lfs diff=lfs merge=lfs -text
 *.pth filter=lfs diff=lfs merge=lfs -text
+exp_result/PA100k/resnet50.base.adam/img_model/metric_2023-04-21_04-05-23.pkl filter=lfs diff=lfs merge=lfs -text
+exp_result/PETA/resnet50.base.adam/img_model/metric_2023-04-22_02-15-39.pkl filter=lfs diff=lfs merge=lfs -text
