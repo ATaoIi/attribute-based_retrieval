@@ -93,7 +93,7 @@ _C.LOSS.TYPE = "bce"
 _C.LOSS.SAMPLE_WEIGHT = ""  # None
 _C.LOSS.LOSS_WEIGHT = [1, ]
 _C.LOSS.SIZESUM = True   # for a sample, BCE losses is the summation of all label instead of the average.
-
+_C.LOSS.SMOOTHING = None  #
 _C.METRIC = CN()
 _C.METRIC.TYPE = 'pedestrian'
 
