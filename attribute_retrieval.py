@@ -13,7 +13,11 @@ from models.model_factory import build_backbone, build_classifier
 from tools.function import get_model_log_path, get_reload_weight
 from tools.utils import set_seed, str2bool, time_str
 from configs.default import _C, update_config
-
+from sklearn.metrics.pairwise import euclidean_distances
+from scipy.stats import pearsonr
+from sklearn.metrics import pairwise_distances
+from scipy.spatial.distance import pdist, squareform
+from models.backbone import swin_transformer,DeiT,vit
 set_seed(605)
 
 def main(cfg, args):
@@ -51,7 +55,7 @@ def main(cfg, args):
     if torch.cuda.is_available():
         model = torch.nn.DataParallel(model).cuda()
 
-    checkpoint = torch.load(os.path.join(model_dir, 'ckpt_max_2023-04-21_04-05-23.pth'))
+    checkpoint = torch.load(os.path.join(model_dir, 'ckpt_max_2023-05-17_02-14-18.pth'))
     model.load_state_dict(checkpoint['state_dicts'])
 
     model.eval()
@@ -66,10 +70,43 @@ def main(cfg, args):
             feature_list.append(features)
             gt_list.append(gt_label.cpu().numpy())
 
+    # features = np.vstack(feature_list)
+    # gt_labels = np.concatenate(gt_list, axis=0)
+    #
+    # similarity_matrix = cosine_similarity(features)(余弦)
+
     features = np.vstack(feature_list)
     gt_labels = np.concatenate(gt_list, axis=0)
 
-    similarity_matrix = cosine_similarity(features)
+    # distance_matrix = euclidean_distances(features)
+    # similarity_matrix = -distance_matrix  # 使距离变为负值以表示相似度（欧几里得）
+
+    # pearson_similarity_matrix = np.corrcoef(features)
+    # similarity_matrix = pearson_similarity_matrix #皮尔逊相关系数
+
+    # Binary thresholding for continuous features
+    # binary_features = (features > 0.5).astype(bool)
+    #
+    # # Compute Jaccard distance
+    # jaccard_distance_matrix = pdist(binary_features, metric='jaccard')
+    #
+    # # Convert Jaccard distance to similarity
+    # jaccard_similarity_matrix = 1 - squareform(jaccard_distance_matrix)
+    #
+    # # Use Jaccard similarity matrix instead of the previous one
+    # similarity_matrix = jaccard_similarity_matrix
+
+    # 融合相似度度量
+    cosine_similarity_matrix = cosine_similarity(features)
+    pearson_similarity_matrix = np.corrcoef(features)
+    euclidean_distance_matrix = euclidean_distances(features)
+    euclidean_similarity_matrix = -euclidean_distance_matrix
+
+    cosine_weight = 1 / 3
+    pearson_weight = 1 / 3
+    euclidean_weight = 1 / 3
+
+    similarity_matrix = cosine_weight * cosine_similarity_matrix + pearson_weight * pearson_similarity_matrix + euclidean_weight * euclidean_similarity_matrix
 
     retrieval_results = []
     for i in range(similarity_matrix.shape[0]):
@@ -89,12 +126,11 @@ def main(cfg, args):
 
 
 def calculate_metrics(rankings, gt_labels):
-    print('okay1')
     ap_scores = []
     rank1_scores = 0
 
     gt_labels_int = np.argmax(gt_labels, axis=1)
-    similarity_threshold = 0.999  # You can adjust this value to change the similarity threshold
+    similarity_threshold = 0.999999  # You can adjust this value to change the similarity threshold
 
     for i, ranking in enumerate(rankings):
         # Remove the query image itself from the ranking
@@ -117,7 +153,6 @@ def calculate_metrics(rankings, gt_labels):
         if ranking[0] in relevant_indices and top_ranked_similarity > similarity_threshold:
             rank1_scores += 1
 
-    print('okay2')
     return np.mean(ap_scores), rank1_scores / len(rankings)
 
 

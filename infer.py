@@ -21,10 +21,11 @@ from tools.function import get_model_log_path, get_reload_weight
 from tools.utils import set_seed, str2bool, time_str
 
 from losses import bceloss
-
+from models.backbone import swin_transformer,DeiT,vit
 set_seed(605)
 
 from tools.function import compare_dicts
+
 
 def main(cfg, args):
     exp_dir = os.path.join('exp_result', cfg.DATASET.NAME)
@@ -33,12 +34,10 @@ def main(cfg, args):
     train_tsfm, valid_tsfm = get_transform(cfg)
     print(valid_tsfm)
 
-
     train_set = PedesAttr(cfg=cfg, split=cfg.DATASET.TRAIN_SPLIT, transform=valid_tsfm,
-                              target_transform=cfg.DATASET.TARGETTRANSFORM)
+                          target_transform=cfg.DATASET.TARGETTRANSFORM)
     valid_set = PedesAttr(cfg=cfg, split=cfg.DATASET.VAL_SPLIT, transform=valid_tsfm,
-                              target_transform=cfg.DATASET.TARGETTRANSFORM)
-
+                          target_transform=cfg.DATASET.TARGETTRANSFORM)
 
     train_loader = DataLoader(
         dataset=train_set,
@@ -62,18 +61,19 @@ def main(cfg, args):
 
     backbone, c_output = build_backbone(cfg.BACKBONE.TYPE, cfg.BACKBONE.MULTISCALE)
 
-
     classifier = build_classifier(cfg.CLASSIFIER.NAME)(
         nattr=train_set.attr_num,
         c_in=c_output,
         bn=cfg.CLASSIFIER.BN,
         pool=cfg.CLASSIFIER.POOLING,
-        scale =cfg.CLASSIFIER.SCALE
+        scale=cfg.CLASSIFIER.SCALE
     )
-
+    print(train_set.attr_num)
+    print(valid_set.attr_num)
     model = FeatClassifier(backbone, classifier)
 
-    loaded_model_state_dict = get_reload_weight(model_dir, model, pth=r'C:\Users\licha\PycharmProjects\attribute-based_retrieval\exp_result\PA100k\resnet50.base.adam\img_model\ckpt_max_2023-04-21_04-05-23.pth')
+    loaded_model_state_dict = get_reload_weight(model_dir, model,
+                                                pth=r'C:\Users\licha\PycharmProjects\attribute-based_retrieval\exp_result\PETA\resnet50.base.adam\img_model\ckpt_max_2023-04-22_02-15-39.pth')
 
     if torch.cuda.is_available():
         model = torch.nn.DataParallel(model).cuda()
@@ -85,7 +85,7 @@ def main(cfg, args):
     # print("Keys in loaded model state_dict but not in original model state_dict:")
     # print(missing_in_original)
 
-    model=loaded_model_state_dict
+    model = loaded_model_state_dict
 
     model.eval()
     preds_probs = []
@@ -93,6 +93,10 @@ def main(cfg, args):
     path_list = []
 
     attn_list = []
+
+    # 这里使用cpu()将张量从GPU转移到CPU，是因为在将张量与numpy()一起使用之前，需要将张量从GPU内存转移到CPU内存。numpy()不支持GPU内存，所以在使用numpy()之前，必须将张量转移到CPU上。
+    #
+    # 这里的代码将特征和标签分别添加到feature_list和gt_list中。这些列表用于在计算过程结束时组合所有批次的特征和标签。因为这些列表最终会被转换为NumPy数组，所以需要将张量转移到CPU并将其转换为NumPy数组，这样在计算结束时可以轻松地连接它们。
     with torch.no_grad():
         for step, (imgs, gt_label, imgname) in enumerate(tqdm(valid_loader)):
             imgs = imgs.cuda()
@@ -104,7 +108,6 @@ def main(cfg, args):
             path_list.extend(imgname)
             gt_list.append(gt_label.cpu().numpy())
             preds_probs.append(valid_probs.cpu().numpy())
-
 
     gt_label = np.concatenate(gt_list, axis=0)
     preds_probs = np.concatenate(preds_probs, axis=0)
@@ -125,9 +128,9 @@ def main(cfg, args):
         with open(os.path.join(model_dir, 'results_test_feat_best.pkl'), 'wb+') as f:
             pickle.dump([valid_result, gt_label, preds_probs, attn_list, path_list], f, protocol=4)
 
-
         print(f'{time_str()}')
         print('-' * 60)
+
 
 def argument_parser():
     parser = argparse.ArgumentParser(description="attribute recognition",
@@ -148,3 +151,6 @@ if __name__ == '__main__':
     update_config(_C, args)
 
     main(_C, args)
+
+# python infer.py --cfg configs/pedes_baseline/pa100k.yaml
+# python infer.py --cfg configs/pedes_baseline/peta.yaml

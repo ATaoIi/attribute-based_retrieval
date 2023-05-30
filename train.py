@@ -35,7 +35,7 @@ from tools.utils import time_str, save_ckpt, ReDirectSTD, set_seed, str2bool
 from models.backbone import  resnet
 from losses import bceloss
 from models import base_block
-
+from models.backbone import swin_transformer,DeiT,vit
 
 import os
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
@@ -402,6 +402,9 @@ if __name__ == '__main__':
     update_config(_C, args)
     main(_C, args)
 
+
+# python train.py --cfg configs/pedes_baseline/peta.yaml
+#python train.py --cfg configs/pedes_baseline/pa100k.yaml
 '''这是`train.py`文件的第一部分代码，主要完成了以下任务：
 
 1. 导入所需的库和模块。
@@ -420,11 +423,18 @@ if __name__ == '__main__':
 - 设置了学习率调度器。
 - 开始训练过程，调用`trainer()`函数。
 
-整个训练过程中，包括了数据集的加载、模型的构建、损失函数的定义、优化器的创建、学习率调度器的设置和实际训练过程。这一部分的代码实现了大部分训练任务的关键功能，同时为训练过程的核心组件提供了基本的框架。'''
+整个训练过程中，包括了数据集的加载、模型的构建、损失函数的定义、优化器的创建、学习率调度器的设置和实际训练过程。这一部分的代码实现了大部分训练任务的关键功能，
+同时为训练过程的核心组件提供了基本的框架。'''
 
 
-'''这是训练模型的后半部分代码。首先是`trainer`函数，它主要负责训练模型、评估模型的性能，并将模型训练的结果保存起来。它接收很多参数，如模型配置、输入参数、模型、数据加载器、损失函数、优化器等。`trainer`函数首先初始化一些变量，然后对每个epoch进行迭代。在每个epoch中，首先更新学习率，然后调用`batch_trainer`函数进行训练。接下来是分布式训练的处理部分，如果使用了分布式训练，需要更新BatchNorm的均值和方差。
+'''这是训练模型的后半部分代码。首先是`trainer`函数，它主要负责训练模型、评估模型的性能，并将模型训练的结果保存起来。
+它接收很多参数，如模型配置、输入参数、模型、数据加载器、损失函数、优化器等。
+`trainer`函数首先初始化一些变量，然后对每个epoch进行迭代。在每个epoch中，首先更新学习率，然后调用`batch_trainer`函数进行训练。
+接下来是分布式训练的处理部分，如果使用了分布式训练，需要更新BatchNorm的均值和方差。
 
-在验证阶段，代码首先检查是否有可用的`model_ema`，然后调用`valid_trainer`函数对模型进行验证。根据配置中的不同学习率调度器类型，代码会更新学习率。接下来，根据配置中的评估指标类型，计算训练集和验证集的评估结果，并打印相关信息。如果当前验证集的评估指标优于之前的最佳结果，那么将当前模型的权重保存下来。
+在验证阶段，代码首先检查是否有可用的`model_ema`，然后调用`valid_trainer`函数对模型进行验证。
+根据配置中的不同学习率调度器类型，代码会更新学习率。
+接下来，根据配置中的评估指标类型，计算训练集和验证集的评估结果，并打印相关信息。
+如果当前验证集的评估指标优于之前的最佳结果，那么将当前模型的权重保存下来。
 
 `trainer`函数后面是`argument_parser`函数，它用于解析命令行参数。接下来是程序的主入口，在这里首先解析命令行参数，然后更新配置，并调用`main`函数开始训练模型。'''
