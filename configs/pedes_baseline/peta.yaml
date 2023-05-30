@@ -1,4 +1,4 @@
-NAME: 'resnet50.base.adam'
+NAME: 'deit_base_distilled_patch16_224.base.adam'
 
 DATASET:
   TYPE: 'pedes'
@@ -7,16 +7,17 @@ DATASET:
   VAL_SPLIT: 'test'
   ZERO_SHOT: False
   LABEL: 'eval'
-  HEIGHT: 256
-  WIDTH: 192
+  HEIGHT: 224
+  WIDTH: 224
 
 RELOAD:
   TYPE: False
   NAME: 'backbone'
 
 BACKBONE:
-  TYPE: 'resnet50'
-
+#  TYPE: 'resnet50'
+ TYPE: 'deit_base_distilled_patch16_224'
+#  TYPE: 'swin_s'
 CLASSIFIER:
   NAME: 'linear'
   POOLING: 'avg'
@@ -27,11 +28,11 @@ LOSS:
   TYPE: 'bceloss'
   LOSS_WEIGHT: [1]
   SAMPLE_WEIGHT: 'weight'
-
+#  SMOOTHING: 0.1
 
 TRAIN:
   CLIP_GRAD: True
-  BATCH_SIZE: 64
+  BATCH_SIZE: 32
   OPTIMIZER:
     TYPE: 'adam'
     WEIGHT_DECAY: 5e-4
