@@ -13,7 +13,7 @@ class PedesAttr(data.Dataset):
 
     def __init__(self, cfg, split, transform=None, target_transform=None, idx=None):
 
-        assert cfg.DATASET.NAME in ['PETA', 'PA100k', 'RAP', 'RAP2'], \
+        assert cfg.DATASET.NAME in ['PETA', 'PA100k', 'RAP', 'RAP2','Market-1501'], \
             f'dataset name {cfg.DATASET.NAME} is not exist'
 
         data_path = get_pkl_rootpath(cfg.DATASET.NAME, cfg.DATASET.ZERO_SHOT)
@@ -93,3 +93,12 @@ class PedesAttr(data.Dataset):
 
     def __len__(self):
         return len(self.img_id)
+# 这段代码定义了一个名为 PedesAttr 的类，该类是一个继承自 torch.utils.data.Dataset 的数据集类，用于处理行人属性数据集。
+#
+# 当实例化 PedesAttr 类时，其 __init__ 方法首先会检查配置参数 cfg.DATASET.NAME 是否在已知的数据集名称中（例如 'PETA', 'PA100k', 'RAP', 'RAP2','Market-1501'）。然后，它会加载对应的 pickle 数据文件，并从中提取图片名称、标签等信息。此外，这段代码还处理了标签的索引和数量，以及数据集的划分（例如，训练集或测试集）。
+#
+# 在这个类中，还定义了两个主要方法：__getitem__ 和 __len__。__getitem__ 方法用于获取指定索引的数据（包括图片和对应的标签），而 __len__ 方法则返回数据集的总长度，即图片的数量。
+#
+# 此外，__getitem__ 方法还包含一些数据预处理步骤，例如：打开并读取图片文件，如果指定了图像变换 transform，则对图片进行变换，同时将标签转换为浮点数等。
+#
+# 总的来说，这段代码是定义和处理行人属性数据集的一个典型实现，能够有效地加载和处理数据，方便后续的机器学习或深度学习任务。
