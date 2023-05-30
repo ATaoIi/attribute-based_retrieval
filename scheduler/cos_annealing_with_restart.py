@@ -1,9 +1,9 @@
 import torch
 import math
-from torch.optim.lr_scheduler import _LRScheduler
+from torch.optim import lr_scheduler
 import matplotlib.pyplot as plt
 
-class CosineAnnealingLR_with_Restart(_LRScheduler):
+class CosineAnnealingLR_with_Restart(lr_scheduler._LRScheduler):
     """Set the learning rate of each parameter group using a cosine annealing
     schedule, where :math:`\eta_{max}` is set to the initial lr and
     :math:`T_{cur}` is the number of epochs since the last restart in SGDR:

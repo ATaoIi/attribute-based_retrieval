@@ -143,24 +143,6 @@ if __name__ == '__main__':
 
     optim = torch.optim.SGD([params], lr, momentum=0.9, weight_decay=5e-4)
 
-    # num_epochs = 160
-
-    # scheduler = CosineLRScheduler(
-    #     optim,
-    #     t_initial=30,
-    #     t_mul=1,  # cosine decay epoch multiplier
-    #     # lr_min=1e-5,  # cosine lr 最终回落的位置
-    #     decay_rate=0.5,
-    #     # warmup_lr_init=1e-5,
-    #     # warmup_t=3,
-    #     cycle_limit=3,  # 最大的限制
-    #     # t_in_epochs=True,
-    #     # noise_range_t=None,
-    #     # noise_pct=0.67,
-    #     # noise_std=1,
-    #     # noise_seed=42
-    # )
-
     # be called .step() after every batch
     scheduler = lr_scheduler.OneCycleLR(optim, max_lr=lr, steps_per_epoch=641, epochs=40,
                                         pct_start=0.0)
