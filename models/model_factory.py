@@ -18,6 +18,8 @@ def build_backbone(key, multi_scale=False):
         'bninception': 1024,
         'tresnetM': 2048,
         'tresnetL': 2048,
+        'deit_base_distilled_patch16_384':1000,
+        'deit_base_distilled_patch16_224':1000
 
     }
 
